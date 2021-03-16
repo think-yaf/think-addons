@@ -53,6 +53,6 @@ class Addons
      */
     public function handle($request, Closure $next)
     {
-        $next($request);
+        return $next($request);
     }
 }
