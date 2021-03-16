@@ -10,9 +10,10 @@ ThinkPHP6 插件助手
 
 #### 安装教程
 
-1. 必须启用命名空间：yaf.use_namespace = 1
+1. 请先安装 composer require topthink/think-multi-app
 2. 安装：composer require thinkyaf/think-addons dev-main
 3. 更新：composer update thinkyaf/think-addons dev-main
+3. 移除：composer remove thinkyaf/think-addons
 
 #### 使用说明
 
