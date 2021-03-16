@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace think\app;
+namespace think\addons;
 
 use Closure;
 use think\App;

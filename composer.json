@@ -1,7 +1,10 @@
 {
     "name": "thinkyaf/think-addons",
     "description": "ThinkPHP6 think-addons",
+    "homepage": "https://github.com/think-yaf/think-addons",
     "license": "Apache-2.0",
+    "minimum-stability": "dev",
+    "version": "1.0",
     "authors": [
         {
             "name": "Tan Minghe",
@@ -21,9 +24,13 @@
         ]
     },
     "extra": {
-        "think-config": {
-            "addons": "src/config.php"
+        "think": {
+            "services": [
+                "think\\addons\\Service"
+            ],
+            "config": {
+                "addons": "src/config.php"
+            }
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
