@@ -10,14 +10,12 @@ ThinkPHP6 插件助手
 
 #### 安装教程
 
-1. 请先安装 composer require topthink/think-multi-app
-2. 安装：composer require thinkyaf/think-addons dev-main
-3. 更新：composer update thinkyaf/think-addons dev-main
+1. 安装：composer require thinkyaf/think-addons dev-main
+2. 更新：composer update thinkyaf/think-addons dev-main
 3. 移除：composer remove thinkyaf/think-addons
 
 #### 使用说明
 
 1. 建议使用PHP7.0以上
 2. 想怎么用就怎么用
-3. v1-1-2
 
