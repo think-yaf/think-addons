@@ -7,7 +7,9 @@ class Service extends BaseService
 {
     public function boot()
     {
-        
-        echo '成功啦';
+        $this->app->event->listen('HttpRun', function () {
+            return $this->app->middleware->add(Addons::class);
+        });
+       
     }
 }

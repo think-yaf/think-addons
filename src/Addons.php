@@ -9,6 +9,8 @@ use think\App;
 use think\exception\HttpException;
 use think\Request;
 use think\Response;
+use think\addons\Controller;
+use think\helper\Str;
 
 /**
  * 多应用模式支持
@@ -20,18 +22,6 @@ class Addons
     protected $app;
 
     /**
-     * 应用名称
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * 应用名称
-     * @var string
-     */
-    protected $appName;
-
-    /**
      * 应用路径
      * @var string
      */
@@ -40,8 +30,7 @@ class Addons
     public function __construct(App $app)
     {
         $this->app  = $app;
-        $this->name = $this->app->http->getName();
-        $this->path = $this->app->http->getPath();
+        $this->http = $this->app->http;
     }
 
     /**
@@ -51,8 +40,45 @@ class Addons
      * @param Closure $next
      * @return Response
      */
+
     public function handle($request, Closure $next)
     {
+        pre( $this->app->middleware->all());
         return $next($request);
+    }
+
+
+
+
+
+
+
+
+    public function handles($request, Closure $next)
+    {
+        $namespace = $this->parseNamespace($request->controller());
+        $controller = $this->parseController($request->controller());
+        $this->app->config->set(['app_namespace' => $namespace], 'app');
+        $this->app->request->setController($controller);
+        $request->setController($controller);
+        echo ' 当前控制器：'.$namespace . '\\' . $this->app->config->get('route.controller_layer') . '\\' . $controller;
+        return $next($request);
+    }
+
+    public function parseController(string $name): string
+    {
+        $name  = str_replace(['/', '.'], '\\', strpos($name, '.') ? $name : Str::lower($name));
+        $array = explode('\\', $name);
+        $class = Str::studly(array_pop($array));
+        array_shift($array);
+        $path  = $array ? implode('\\', $array) . '\\' : '';
+        return  $path . $class;
+    }
+
+    public function parseNamespace(string $name): string
+    {
+        $name  = str_replace(['/', '.'], '\\', strpos($name, '.') ? $name : Str::lower($name));
+        $array = explode('\\', $name);
+        return 'app\\addons\\' . $array[0] . ($this->http->getName() ? '\\' . $this->http->getName() : '');
     }
 }
