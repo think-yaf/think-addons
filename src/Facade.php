@@ -8,19 +8,13 @@
 // +----------------------------------------------------------------------
 // | Author: thinkyaf <thinkyaf@qq.com>
 // +----------------------------------------------------------------------
+declare(strict_types=1);
+
 namespace think\addons;
 
-use think\Service as BaseService;
-use think\app\MultiApp;
+use  think\Facade as BaseFacade;
 
-class Service extends BaseService
+class Facade extends BaseFacade
 {
-    public function boot()
-    {
-        $this->app->event->listen('HttpRun', function () {
-            //判断多应用
-            $type = class_exists(MultiApp::class) ? 'app' : 'global';
-            $this->app->middleware->add(Addons::class, $type);
-        });
-    }
+     
 }

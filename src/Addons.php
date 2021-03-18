@@ -1,12 +1,12 @@
 <?php
 // +----------------------------------------------------------------------
-// | ThinkPHP [ WE CAN DO IT JUST THINK ]
+// | ThinkYaf [ think-addons 始于 thinkphp6 高级用法 ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2019 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2021-now http://thinkyaf.com All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
-// | Author: liu21st <liu21st@gmail.com>
+// | Author: thinkyaf <thinkyaf@qq.com>
 // +----------------------------------------------------------------------
 declare(strict_types=1);
 
@@ -107,15 +107,17 @@ class Addons
     protected function setAddons(string $appName): bool
     {
         $addons_namespace = $this->app->config->get('app.app_namespace') ?: 'app\\' . 'addons\\'  . $appName;
-        $addonsPath = $this->app->getRootPath() . $addons_namespace . DIRECTORY_SEPARATOR;
+        $addonsRootPath = $this->app->getRootPath() . $addons_namespace . DIRECTORY_SEPARATOR;
         $namespace =  $addons_namespace . ($this->name ? '\\' . $this->name : '');
         $appPath = $this->app->getRootPath() . $namespace . DIRECTORY_SEPARATOR;
         if (is_dir($appPath)) {
-            $config_file = $addonsPath . 'config' . $this->app->getConfigExt();
+            $config_file = $addonsRootPath . 'config' . $this->app->getConfigExt();
             if (is_file($config_file)) {
                 $this->app->config->load($config_file, 'addons');
             }
             if ($this->app->config->get('addons.addon_on')) {
+                // 获取旧数据
+                $app_path = $this->app->getAppPath();
                 // 设置路径
                 $this->app->setAppPath($appPath);
                 // 设置插件命名空间
@@ -126,6 +128,10 @@ class Addons
                 $this->app->http->setRoutePath($this->getRoutePath());
                 //加载插件文件
                 $this->loadAddons($appPath);
+                //设置插件名称关键字
+                $view_dir_name = $this->app->config->get('view.view_dir_name', 'view') . '\\';
+                $this->app->config->set(['view_path' => $appPath . $view_dir_name, 'view_path_app' => $app_path . $view_dir_name], 'view');
+                $this->app->config->set(['addon_name' => $appName, 'addon_path' => $appPath], 'addons');
                 // 返回插件状态
                 return true;
             }
