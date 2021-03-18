@@ -15,8 +15,9 @@ namespace think\addons;
 //use  think\View as BaseView; // extends BaseView
 use think\facade\View as BaseView;
 use think\App;
+use think\helper\Str;
 
-class View
+class View extends BaseView
 {
     protected $app;
     protected $request;
@@ -34,15 +35,16 @@ class View
         $this->request = $app->request;
         $this->config = $app->config;
         $this->data['title'] = $this->app->config->get('app.app_name', '企业管理系统');
+        $this->path = $this->config->get('addons.addon_path', $this->app->getAppPath()) . $this->config->get('view.view_dir_name', 'view') . '\\';
     }
 
     // 设置模板布局
     protected function layout($name = false)
     {
         if ($name && $name != 'false') {
-            $layout_path = $this->app->config->get('view.view_path') . $name . '.html';
-            if (file_exists($layout_path)) {
-                return  $this->app->config->set(['layout_name' => $name], 'view');
+            $name = str_replace(['/', ':'], '\\', $name);
+            if (file_exists($layout_path = $this->getPath() . $name . '.' . $this->app->config->get('view.view_suffix'))) {
+                $this->app->config->set(['layout_name' => $layout_path], 'view');
             }
             return false;
         }
@@ -62,20 +64,46 @@ class View
     //显示模板
     public function fetch($template = '', array $vars = [])
     {
-        $this->data['code'] = ($template === false || strpos((isset($this->data['msg']) ? $this->data['msg'] : ''), '成功') === false) ? 1 : 0;
-        // 判断是否为接口请求
-        if ($this->request->isAjax() || strtolower($this->request->ext()) == 'json' || is_bool($template)) {
-            return json($this->data);
-        }
-        //查找插件模板
-        if (!BaseView::engine('php')->exists($template)) {
-            //尝试使用默认的目模板录
-            $view_path = $this->config->get('view.view_path_app');
-            if ($this->config->get('addons.addon_name')) {
-                $view_path = $view_path . $this->config->get('addons.addon_name') . '\\';
-            }
-            $this->config->set(['view_path' => $view_path], 'view');
-        }
+        $template = $this->parseTemplate($template);
         return BaseView::fetch($template, $vars);
+    }
+    public function getPath()
+    {
+        return $this->path;
+    }
+    // 模板自动解析
+    private function parseTemplate(string $template): string
+    {
+        $request = $this->app->request;
+        $path = $this->path;
+        $depr = $this->config->get('view.view_depr');
+        if (0 !== strpos($template, '/')) {
+            $template   = str_replace(['/', ':'], $depr, $template);
+            $controller = $request->controller();
+            if (strpos($controller, '.')) {
+                $pos        = strrpos($controller, '.');
+                $controller = substr($controller, 0, $pos) . '.' . Str::snake(substr($controller, $pos + 1));
+            } else {
+                $controller = Str::snake($controller);
+            }
+            if ($controller) {
+                if ('' == $template) {
+                    // 如果模板文件名为空 按照默认规则定位
+                    if (2 == $this->config->get('view.auto_rule')) {
+                        $template = $request->action(true);
+                    } elseif (3 == $this->config->get('view.auto_rule')) {
+                        $template = $request->action();
+                    } else {
+                        $template = Str::snake($request->action());
+                    }
+                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $template;
+                } elseif (false === strpos($template, $depr)) {
+                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $template;
+                }
+            }
+        } else {
+            $template = str_replace(['/', ':'], $depr, substr($template, 1));
+        }
+        return $path . ltrim($template, '/') . '.' . ltrim($this->config->get('view.view_suffix'), '.');
     }
 }

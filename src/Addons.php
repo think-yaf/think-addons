@@ -130,7 +130,7 @@ class Addons
                 $this->loadAddons($appPath);
                 //设置插件名称关键字
                 $view_dir_name = $this->app->config->get('view.view_dir_name', 'view') . '\\';
-                $this->app->config->set(['view_path' => $appPath . $view_dir_name, 'view_path_app' => $app_path . $view_dir_name], 'view');
+                $this->app->config->set(['view_path' => $app_path . $view_dir_name], 'view');
                 $this->app->config->set(['addon_name' => $appName, 'addon_path' => $appPath], 'addons');
                 // 返回插件状态
                 return true;
