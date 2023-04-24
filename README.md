@@ -3,8 +3,6 @@
 #### 介绍
 
 ThinkPHP6 插件助手
-
-官网：http://www.thinkyaf.com/
 微信/QQ：844888168
 
 
